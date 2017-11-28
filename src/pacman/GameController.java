@@ -2,7 +2,6 @@ package pacman;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -29,8 +28,6 @@ import pacman.actors.eatable_tile_actors.Energizer;
 import pacman.impls.game_containers.ClassicGameContainer;
 import pacman.utils.Direction;
 import pacman.utils.Sound;
-import pacman.utils.TextOutputInParts;
-import pacman.utils.TickTimer;
 import pacman.utils.Timer;
 import pacman.utils.Vector2;
 
@@ -91,8 +88,6 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
     private static final Font F1 = App.getRetroFontOf(30);
     private static final double X1 = centerText(GAME_NAME, F1, IN_THE_CENTER);
     private static final double Y1 = App.H / 3D;
-    private static final TextOutputInParts TOIP1 = new TextOutputInParts(GAME_NAME);
-    private static final TickTimer T1 = new TickTimer();
 //  
 
 //  Available game containers name drawing attributes
@@ -284,7 +279,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
                         game.pacman.reset();
                         game.field.setFlickering(false);
                         for (Ghost g : game.ghosts) g.reset();
-                        for (GameObserver go : game.observers) go.notify(STAGE_STARTS);
+                        game.notifyObservers(STAGE_STARTS);
                         game.judge.pauseTimers();
                     }
                 }   break;
@@ -337,16 +332,14 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
                     y2 = (int) g.pos.y;
                     deadGhost = g;
                     t3.reset();
-                    for (GameObserver go : game.observers) 
-                        go.notify(GHOST_DIED);
+                    game.notifyObservers(GHOST_DIED);
                     EATING_GHOST.play(false);
                 } else {
                     allSoundsOff();
                     state = PLAYER_DEAD;
                     t4.reset();
                     game.pacman.animationStopped = true;
-                    for (GameObserver go : game.observers)
-                        go.notify(PACMAN_DIED);
+                    game.notifyObservers(PACMAN_DIED);
                 }
                 break;
             }
@@ -386,7 +379,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
             Class<? extends GameContainer> clazz = GAME_CONTAINERS_CLASSES[selectedPage][selectedContainer];
             Method create = clazz.getMethod("create");
             game = (GameContainer) create.invoke(null);
-            game.observers.addAll(Arrays.asList(game.field, game.judge, this));
+            game.addObservers(game.field, game.judge, this);
             GameField gf = game.field;
             int w = gf.xBoundReal;
             int h = gf.yBoundReal;
@@ -401,7 +394,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
             livesRemainStr = "LIVES: 3";
             t1.reset();
             game.judge.pauseTimers();
-            for (GameObserver go : game.observers) go.notify(STAGE_STARTS);
+            game.notifyObservers(STAGE_STARTS);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             System.exit(0);
         }
@@ -457,7 +450,10 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
                 EATING_BONUS.play(false);
                 q.add(bes);
                 break;
-            default:
+            case EXTRA_LIFE:
+                game.player.extraLife();
+                EXTRA_LIFE_SOUND.play(false);
+                livesRemainStr = "LIVES: " + game.player.getLifesCount();
                 break;
         }
     }

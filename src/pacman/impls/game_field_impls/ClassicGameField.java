@@ -9,7 +9,6 @@ import static pacman.App.DRAWING_TILE_SIZE;
 import static pacman.App.DTS_DIV_TS;
 import pacman.GameContainer;
 import pacman.GameController;
-import pacman.GameObserver;
 import pacman.actors.GameField;
 import pacman.actors.dynamic_tile_actors.DynamicTileActor;
 import pacman.actors.dynamic_tile_actors.Ghost;
@@ -72,10 +71,6 @@ public class ClassicGameField extends GameField {
     
     private static final float BONUS_X_REAL = 14F * DRAWING_TILE_SIZE;
     private static final float BONUS_Y_REAL = 20.5F * DRAWING_TILE_SIZE;
-    
-    private static final int BONUS_X_TILE = 14;
-    private static final int BONUS_Y_TILE = 20;
-    
     
     private static Bonus[] createBonuses() {
         Bonus[] bonuses = new Bonus[Bonus.BONUSES_COUNT];
@@ -175,7 +170,7 @@ public class ClassicGameField extends GameField {
     @Override
     public void draw(GraphicsContext gc) {
         super.draw(gc); 
-        for (Bonus b : bonuses) b.draw(gc);
+        bonuses[currentBonusIdx].draw(gc);
     }
 
     @Override
@@ -276,13 +271,6 @@ public class ClassicGameField extends GameField {
         boolean b_2 = y == 14 || y == 26;
         return !(b_1 && b_2);
     }
-
-    private static final Vector2[] POS_IN_PEN = {
-        new Vector2(14 * DRAWING_TILE_SIZE, 17.5F * DRAWING_TILE_SIZE),
-        new Vector2(14 * DRAWING_TILE_SIZE, 17.5F * DRAWING_TILE_SIZE),
-        new Vector2(12 * DRAWING_TILE_SIZE, 17.5F * DRAWING_TILE_SIZE),
-        new Vector2(16 * DRAWING_TILE_SIZE, 17.5F * DRAWING_TILE_SIZE)
-    };
     
     private static final Vector2[][] IN_PEN_WAYPOINTS = {
         {
@@ -354,24 +342,29 @@ public class ClassicGameField extends GameField {
         super.notify(event);
         checkBonus();
         checkExtraLife();
-        if (event == STAGE_STARTS) {
-            currentBonusIdx = Math.min(currentBonusIdx + 1, Bonus.BONUSES_COUNT - 1);
-            bonus1Activated = false;
-            bonus2Activated = false;
-        } else if (event == PACMAN_TILE_CHANGED) {
-            Bonus b = bonuses[currentBonusIdx];
-            if (!b.isEated()) {
-                int px = game.pacman.tile_x;
-                int py = game.pacman.tile_y;
-                if (px == b.tile_x && py == b.tile_y) {
-                    b.eat();
-                    lastEated = b;
-                    for (GameObserver go : game.observers) 
-                        go.notify(PACMAN_ATE_THE_BONUS);
-                }
-            }
-        } else if (event == PACMAN_DIED) 
-            bonuses[currentBonusIdx].eat();
+        switch (event) {
+            case STAGE_STARTS:
+                currentBonusIdx = Math.min(currentBonusIdx + 1, Bonus.BONUSES_COUNT - 1);
+                bonus1Activated = false;
+                bonus2Activated = false;
+                break;
+            case PACMAN_TILE_CHANGED:
+                Bonus b = bonuses[currentBonusIdx];
+                if (!b.isEated()) {
+                    int px = game.pacman.tile_x;
+                    int py = game.pacman.tile_y;
+                    if (px == b.tile_x && py == b.tile_y) {
+                        b.eat();
+                        lastEated = b;
+                        game.notifyObservers(PACMAN_ATE_THE_BONUS);
+                    }
+                }   break;
+            case PACMAN_DIED:
+                bonuses[currentBonusIdx].eat();
+                break;
+            default:
+                break;
+        }
     }
     
     private void checkExtraLife() {
@@ -379,11 +372,8 @@ public class ClassicGameField extends GameField {
         int delta = n - prevPlayerScore;
         scoreToExtraLife -= delta;
         if (scoreToExtraLife <= 0) {
-            game.player.extraLife();
             scoreToExtraLife += 10000;
-            for (GameObserver go : game.observers)
-                if (go != this)
-                    go.notify(EXTRA_LIFE);
+            game.notifyObservers(EXTRA_LIFE);
         }
         prevPlayerScore = game.player.getScore();
     }
@@ -394,19 +384,14 @@ public class ClassicGameField extends GameField {
                 bonus1Activated = true;
                 bonuses[currentBonusIdx].reset();
             }
-        } else {
-            if (dotsEated == 100) 
-                bonuses[currentBonusIdx].eat();
-        }
+        } else if (dotsEated == 100) bonuses[currentBonusIdx].eat();
         if (!bonus2Activated) {
             if (dotsEated == 170) {
                 bonus2Activated = true;
                 bonuses[currentBonusIdx].reset();
             }
-        } else {
-            if (dotsEated == 200) 
-                bonuses[currentBonusIdx].eat();
-        }
+        } else if (dotsEated == 200) bonuses[currentBonusIdx].eat();
+        
     }
     
     private static boolean isInTunnel(Ghost g) {

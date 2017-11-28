@@ -3,8 +3,6 @@ package pacman;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.geometry.Bounds;
@@ -29,7 +27,6 @@ public class App extends Application {
     public static final int DRAWING_TILE_SIZE   = 16;
     
     public static final float DTS_DIV_TS = (float) DRAWING_TILE_SIZE / TILE_SIZE;
-    public static final float DTS_DIV_2 = (float) DRAWING_TILE_SIZE / 2;
     
     private static final int CANVAS_INIT_WIDTH       = 400;
     private static final int CANVAS_INIT_HEIGHT      = 400;
@@ -46,11 +43,11 @@ public class App extends Application {
         try {
             IMAGES_DIRECTORY = new File("resources/img").getAbsolutePath();
             SOUNDS_DIRECTORY = new File("resources/sounds").getAbsolutePath();
-            Class.forName("pacman.SoundStore");
             RETRO_FONT = Font.loadFont(new FileInputStream(new File("resources/font/8bit16.TTF").getAbsolutePath()), 1.0D);
-        } catch (ClassNotFoundException | FileNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
             System.exit(0);
         }
+        
     }
     
     private static Stage stage;

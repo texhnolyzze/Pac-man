@@ -1,5 +1,6 @@
 package pacman;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import pacman.actors.GameField;
@@ -21,7 +22,15 @@ public class GameContainer {
     public Pacman pacman;
     public Ghost[] ghosts;
     
-    public List<GameObserver> observers = new LinkedList<>();
+    private List<GameObserver> observers = new LinkedList<>();
+    
+    public void notifyObservers(int event) {
+        for (GameObserver go : observers) go.notify(event);
+    }
+    
+    public void addObservers(GameObserver...observers) {
+        this.observers.addAll(Arrays.asList(observers));
+    }
     
     public int lvl = 1;
     

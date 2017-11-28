@@ -133,24 +133,6 @@ public abstract class DynamicTileActor extends TileActor {
     
     protected abstract int getCurrentImageIdx();
     
-    protected float getCurrentWidth() {
-        int animIdx = getCurrentAnimationIdx();
-        if (animIdx != -1) return anims[animIdx].getWidth();
-        else {
-            int imgIdx = getCurrentImageIdx();
-            return (float) images[imgIdx].getWidth();
-        }
-    }
-    
-    protected float getCurrentHeight() {
-        int animIdx = getCurrentAnimationIdx();
-        if (animIdx != -1) return anims[animIdx].getHeight();
-        else {
-            int imgIdx = getCurrentImageIdx();
-            return (float) images[imgIdx].getHeight();
-        }
-    }
-    
     protected boolean canChangeDirTo(Direction dir) {
         if (!game.field.canChangeDirTo(dir, this)) 
             return false;

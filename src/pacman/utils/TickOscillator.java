@@ -24,13 +24,11 @@ public class TickOscillator {
     }
     
     public void tick() {
-        if (increment) {
-            ticksPassed++;
-            if (ticksPassed == freq) increment = false;
-        } else {
-            ticksPassed--;
-            if (ticksPassed == 0) increment = true;
-        }
+        if (increment) 
+            if (++ticksPassed == freq) increment = false;
+        else 
+            if (--ticksPassed == 0) increment = true;
+        
     }
     
     public void reset(int freq) {

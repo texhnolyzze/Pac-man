@@ -150,8 +150,7 @@ public abstract class GameField implements Actor, GameObserver {
             dotEatingTimer.tick();
             if (dotEatingTimer.passed(ticks)) {
                 pacmanOnDotsLine = false;
-                for (GameObserver go : game.observers) 
-                    go.notify(PACMAN_LEAVED_DOTS_LINE);
+                game.notifyObservers(PACMAN_LEAVED_DOTS_LINE);
             }
         }
     }
@@ -190,8 +189,7 @@ public abstract class GameField implements Actor, GameObserver {
                     energizersEated++;
                     evnt = PACMAN_ATE_THE_ENERGIZER;
                 }
-                for (GameObserver go : game.observers) 
-                    go.notify(evnt);   
+                game.notifyObservers(evnt);
             }
         }
     }

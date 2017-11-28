@@ -46,16 +46,6 @@ public class Stack<T> {
         return elem;
     }
     
-    public Object[] asArray(T[] storage) {
-        StackNode<T> tmp = top;
-        for (int i = 0; i < Math.min(size, storage.length); i++) {
-            storage[i] = tmp.elem;
-            tmp = tmp.prev;
-        }
-        return storage;
-    }
-        
-    
     @Override
     public String toString() {
         StackNode<T> tmp = top;

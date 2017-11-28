@@ -120,40 +120,48 @@ public class ClassicGameJudge extends GameJudge {
     @Override
     public void notify(int event) {
         super.notify(event);
-        if (event == STAGE_STARTS) {
-            chasing = false;
-            usingGlobalDotCounter = false;
-            personalDotCounter.clear();
-            int lvl = game.lvl;
-            idx1 = lvl == 1 ? 0 : lvl <= 4 ? 1 : 2;
-            idx2 = lvl == 1 ? 0 : lvl == 2 ? 1 : 2;
-        } else if (event == PACMAN_ATE_THE_DOT) {
-            if (!usingGlobalDotCounter) {
-                int idx = getPreferredGhostIdx();
-                if (idx != -1) {
-                    Ghost g = game.ghosts[idx];
-                    int n = personalDotCounter.getOrDefault(g, 0) + 1;
-                    personalDotCounter.put(g, n);
-                }
-            } else {
-                globalDotCounter++;
-                if (globalDotCounter == 32) {
-                    for (Ghost g : game.ghosts) {
-                        if (g.type == Ghost.CLYDE 
-                                && (g.getState() & Ghost.IN_PEN) != 0) {
-                            usingGlobalDotCounter = false;
-                            break;
+        switch (event) {
+            case STAGE_STARTS:
+                chasing = false;
+                usingGlobalDotCounter = false;
+                personalDotCounter.clear();
+                int lvl = game.lvl;
+                idx1 = lvl == 1 ? 0 : lvl <= 4 ? 1 : 2;
+                idx2 = lvl == 1 ? 0 : lvl == 2 ? 1 : 2;
+                break;
+            case PACMAN_ATE_THE_DOT:
+                if (!usingGlobalDotCounter) {
+                    int idx = getPreferredGhostIdx();
+                    if (idx != -1) {
+                        Ghost g = game.ghosts[idx];
+                        int n = personalDotCounter.getOrDefault(g, 0) + 1;
+                        personalDotCounter.put(g, n);
+                    }
+                } else {
+                    globalDotCounter++;
+                    if (globalDotCounter == 32) {
+                        for (Ghost g : game.ghosts) {
+                            if (g.type == Ghost.CLYDE
+                                    && (g.getState() & Ghost.IN_PEN) != 0) {
+                                usingGlobalDotCounter = false;
+                                break;
+                            }
                         }
                     }
-                }
-            }
-        } else if (event == PACMAN_ATE_THE_ENERGIZER) {
-            scatterChaseTimer.pause();
-        } else if (event == POWER_UP_END) {
-            scatterChaseTimer.resume();
-        } else if (event == PACMAN_DIED) {
-            globalDotCounter = 0;
-            usingGlobalDotCounter = true;
+                }   
+                break;
+            case PACMAN_DIED:
+                globalDotCounter = 0;
+                usingGlobalDotCounter = true;
+                break;
+            case PACMAN_ATE_THE_ENERGIZER:
+                scatterChaseTimer.pause();
+                break;
+            case POWER_UP_END:
+                scatterChaseTimer.resume();
+                break;
+            default:
+                break;
         }
     }
 

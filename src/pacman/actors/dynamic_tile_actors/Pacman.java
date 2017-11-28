@@ -51,8 +51,6 @@ public class Pacman extends DynamicTileActor {
     public void dead() {
         super.dead(); 
         anims[4].setDrawOnce(true);
-        for (GameObserver go : game.observers)
-            go.notify(PACMAN_DIED);
     }
 
     @Override
@@ -72,14 +70,13 @@ public class Pacman extends DynamicTileActor {
     public void update() {
         if (state == POWER_UP && game.judge.powerUpEnd()) {
             state = NORMAL;
-            for (GameObserver go : game.observers) go.notify(POWER_UP_END);
+            game.notifyObservers(POWER_UP_END);
         }
         if (canMoveInCurrentDir) {
             velocity = game.field.getCurrentVelocityFor(this);
             boolean tilePosChanged = move();
             if (tilePosChanged) {
-                for (GameObserver observer : game.observers)
-                    observer.notify(PACMAN_TILE_CHANGED);
+                game.notifyObservers(PACMAN_TILE_CHANGED);
             }
         }
         if (dir != desired) {

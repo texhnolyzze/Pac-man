@@ -30,14 +30,6 @@ public class Vector2 {
         return this;
     }
     
-    public float len() {
-        return (float) Math.sqrt(len2());
-    }
-    
-    public float len2() {
-        return x * x + y * y;
-    }
-    
     public float dist(Vector2 v) {
         float xx = x - v.x;
         float yy = y - v.y;
