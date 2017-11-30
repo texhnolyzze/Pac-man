@@ -29,7 +29,7 @@ public class Energizer extends EatableTileActor {
     
     @Override
     protected void draw0(GraphicsContext gc) {
-        if (t.getState()) 
+        if ((ANIMATE && t.getState()) || (!ANIMATE)) 
             gc.drawImage(ENERGIZER, 0, 0);
         if (ANIMATE) 
             t.tick();

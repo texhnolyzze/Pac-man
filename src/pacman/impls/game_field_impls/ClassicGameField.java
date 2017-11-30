@@ -205,7 +205,7 @@ public class ClassicGameField extends GameField {
         }
     };
     
-    private static float MAX_V = 1.5F * DTS_DIV_TS;
+    private static float MAX_V = 1.25F * DTS_DIV_TS;
     
     private static float getSpeedFor(float percents) {
         return MAX_V * percents;
@@ -402,9 +402,9 @@ public class ClassicGameField extends GameField {
     private final Vector2 READY_LABEL_POS, LIVES_REMAIN_LABEL_POS, SCORE_LABEL_POS; 
     
     {
-        int x1 = App.centerText("READY?", GameController.F3, App.IN_THE_CENTER, xBoundReal);
-        int x2 = App.centerText("LIVES: 3", GameController.F3, App.IN_THE_CENTER, xBoundReal);
-        int x3 = App.centerText("SCORE: 0", GameController.F3, App.IN_THE_CENTER, xBoundReal);
+        int x1 = App.centerText("READY?", GameController.F3, App.IN_THE_CENTER, xBoundPix);
+        int x2 = App.centerText("LIVES: 3", GameController.F3, App.IN_THE_CENTER, xBoundPix);
+        int x3 = App.centerText("SCORE: 0", GameController.F3, App.IN_THE_CENTER, xBoundPix);
         READY_LABEL_POS = new Vector2(x1, 20.8F * DRAWING_TILE_SIZE);
         LIVES_REMAIN_LABEL_POS = new Vector2(x2, 35.3F * DRAWING_TILE_SIZE);
         SCORE_LABEL_POS = new Vector2(x3, 1.8F * DRAWING_TILE_SIZE);

@@ -24,11 +24,11 @@ public class TickOscillator {
     }
     
     public void tick() {
-        if (increment) 
+        if (increment) {
             if (++ticksPassed == freq) increment = false;
-        else 
+        } else { 
             if (--ticksPassed == 0) increment = true;
-        
+        }
     }
     
     public void reset(int freq) {

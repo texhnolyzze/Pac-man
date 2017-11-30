@@ -28,8 +28,8 @@ public class App extends Application {
     
     public static final float DTS_DIV_TS = (float) DRAWING_TILE_SIZE / TILE_SIZE;
     
-    private static final int CANVAS_INIT_WIDTH       = 400;
-    private static final int CANVAS_INIT_HEIGHT      = 400;
+    public static final int CANVAS_INIT_WIDTH       = 400;
+    public static final int CANVAS_INIT_HEIGHT      = 400;
     
     private static final int WINDOW_WIDTH_OFFSET    = 6;
     private static final int WINDOW_HEIGHT_OFFSET   = 25;

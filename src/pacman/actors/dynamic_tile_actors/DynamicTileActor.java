@@ -190,8 +190,8 @@ public abstract class DynamicTileActor extends TileActor {
                 }
             }
         }
-        int xb = game.field.xBoundReal;
-        int yb = game.field.yBoundReal;
+        int xb = game.field.xBoundPix;
+        int yb = game.field.yBoundPix;
         pos.closureLocal(xb, yb);
         tile_x = (int) (pos.x / DRAWING_TILE_SIZE);
         tile_y = (int) (pos.y / DRAWING_TILE_SIZE);

@@ -90,7 +90,7 @@ public class Pacman extends DynamicTileActor {
 
     @Override
     public void draw(GraphicsContext gc) {
-        if (!canMoveInCurrentDir) 
+        if (state != DEAD && !canMoveInCurrentDir) 
             animationStopped = true;
         super.draw(gc); 
     }

@@ -32,7 +32,7 @@ public abstract class GameField implements Actor, GameObserver {
     public static final int GHOSTS_PEN_GATES    = 4;
     
     public final int xBoundTile, yBoundTile;
-    public final int xBoundReal, yBoundReal;
+    public final int xBoundPix, yBoundPix;
 
     protected GameContainer game;
     
@@ -64,8 +64,8 @@ public abstract class GameField implements Actor, GameObserver {
         this.m = new HashMap<>();
         yBoundTile = maze.length;
         xBoundTile = maze[0].length;
-        yBoundReal = yBoundTile * DRAWING_TILE_SIZE;
-        xBoundReal = xBoundTile * DRAWING_TILE_SIZE;
+        yBoundPix = yBoundTile * DRAWING_TILE_SIZE;
+        xBoundPix = xBoundTile * DRAWING_TILE_SIZE;
         int temp1 = 0, temp2 = 0;
         for (int y = 0; y < yBoundTile; y++) {
             for (int x = 0; x < xBoundTile; x++) {

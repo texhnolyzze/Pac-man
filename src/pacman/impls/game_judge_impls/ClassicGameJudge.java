@@ -31,8 +31,7 @@ public class ClassicGameJudge extends GameJudge {
         if (usingGlobalDotCounter) {
             return (g.type == Ghost.PINKY && globalDotCounter == 7) || 
                    (g.type == Ghost.INKY  && globalDotCounter == 17);
-        }
-        else {
+        } else {
             Integer i = personalDotCounter.get(g);
             if (i == null) {
                 i = 0;
@@ -127,7 +126,8 @@ public class ClassicGameJudge extends GameJudge {
                 personalDotCounter.clear();
                 int lvl = game.lvl;
                 idx1 = lvl == 1 ? 0 : lvl <= 4 ? 1 : 2;
-                idx2 = lvl == 1 ? 0 : lvl == 2 ? 1 : 2;
+                idx2 = 0;
+                idx3 = lvl == 1 ? 0 : lvl == 2 ? 1 : 2;
                 break;
             case PACMAN_ATE_THE_DOT:
                 if (!usingGlobalDotCounter) {

@@ -108,6 +108,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
         }
     }
     private static final int X3 = App.centerText("< 1 / 1 >", F2, App.IN_THE_CENTER);
+    private static final int Y3 = (int) (App.H / 1.1F);
 //
     
     private void drawMenu() {
@@ -127,7 +128,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
             y_offset += App.H / 5;
         }
         gc.setFill(Color.WHITE);
-        gc.fillText("< " + (selectedPage + 1) + " / " + GAME_CONTAINERS.length + " >", X3, App.H / 1.1D);
+        gc.fillText("< " + (selectedPage + 1) + " / " + GAME_CONTAINERS.length + " >", X3, Y3);
     }
 
 //  HUD drawing attributes
@@ -164,14 +165,28 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
     private int ghostEatingScoreIncrement;
     private String ghostEatingScoreIncrementStr;
     private int x2, y2; //coordinates of score increment str after eating ghost
+
+    private Queue<BonusIncrementStr> q = new LinkedList<>();
     
     static class BonusIncrementStr {
         private final Timer eatingTime = new Timer();
         private float x, y;
         private String str;
-    }
+    }    
+//
     
-    private Queue<BonusIncrementStr> q = new LinkedList<>();
+//  Game over results drawing attributes.
+    
+    private static final Font F4 = App.getRetroFontOf(50);
+    private static final Font F5 = App.getRetroFontOf(25);
+
+    private int x4; //x-coordinate of "GAME OVER" label.    
+    private int y4; //y-coordinate of "GAME OVER" label.
+    private int x5; //x-coordinate of "SCORE: xxx" label.
+    private int y5; //y-coordinate of "SCORE: xxx" label.
+    
+    private String scoreResultStr;
+    
 //
     
     private void drawBonusEatingScoreIncrements() {
@@ -236,8 +251,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
                             gc.fillText(ghostEatingScoreIncrementStr, x2, y2);
                             for (Ghost g : game.ghosts) {
                                 if (g == deadGhost) continue;
-                                if (g.getState() == Ghost.DEAD)
-                                    g.update();
+                                if (g.getState() == Ghost.DEAD) g.update();
                                 g.draw(gc);
                             }
                             if (t3.passed(700)) {
@@ -290,17 +304,22 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
                     game.pacman.draw(gc);
                     for (Ghost g : game.ghosts) g.draw(gc);
                 } else {
-                    EATING_PACMAN.playIfNot(false);
                     if (game.pacman.getState() != Pacman.DEAD) {
                         game.pacman.dead();
                         game.player.decreaseLifesCount();
                         livesRemainStr = "LIVES: " + game.player.getLifesCount();
                         game.pacman.animationStopped = false;
+                        EATING_PACMAN.play(false);
                     }
                     game.pacman.draw(gc);
                     if (t4.passed(3000)) {
                         if (game.player.getLifesCount() == 0) {
                             state = GAME_OVER;
+                            scoreResultStr = "SCORE: " + game.player.getScore();
+                            x4 = App.centerText("GAME OVER", F4, App.IN_THE_CENTER);
+                            y4 = (int) (App.H / 4.0F);
+                            x5 = App.centerText(scoreResultStr, F5, App.IN_THE_CENTER);
+                            y5 = (int) (App.H / 2.0F);
                         } else {
                             Energizer.ANIMATE = false;
                             game.pacman.reset();
@@ -316,7 +335,11 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
                     }
                 }   break;
             default: //Game over state
-                
+                gc.setFill(Color.RED);
+                gc.setFont(F4);
+                gc.fillText("GAME OVER", x4, y4);
+                gc.setFont(F5);
+                gc.fillText(scoreResultStr, x5, y5);
                 break;            
         }
     }
@@ -381,9 +404,7 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
             game = (GameContainer) create.invoke(null);
             game.addObservers(game.field, game.judge, this);
             GameField gf = game.field;
-            int w = gf.xBoundReal;
-            int h = gf.yBoundReal;
-            App.resize(w, h);
+            App.resize(gf.xBoundPix, gf.yBoundPix);
             game.player = new Player(3);
             Energizer.ANIMATE = false;
             game.pacman.animationStopped = true;
@@ -415,6 +436,9 @@ public class GameController extends AnimationTimer implements EventHandler<KeyEv
             else if (code == KeyCode.DOWN) p.setDesiredDirection(Direction.BOTTOM);
             else if (code == KeyCode.LEFT) p.setDesiredDirection(Direction.LEFT);
             else if (code == KeyCode.RIGHT) p.setDesiredDirection(Direction.RIGHT);
+        } else if (state == GAME_OVER && event.getEventType() == KeyEvent.KEY_PRESSED) {
+            state = MENU;
+            App.resize(App.CANVAS_INIT_WIDTH, App.CANVAS_INIT_HEIGHT);
         }
     }
     

@@ -94,43 +94,48 @@ public class Ghost extends DynamicTileActor {
     @Override
     public void dead() {
         super.dead(); 
-        tile_x = (int) (pos.x / DRAWING_TILE_SIZE); //if ghost is in pen
-        tile_y = (int) (pos.y / DRAWING_TILE_SIZE); //or leaving pen state
-        //The last point in this array is the target of the ghost
-        waypoints = game.field.getWaypointsForLeavingPen(this);
-        waypointIdx = waypoints.length - 1;
-        deadStateTarget.set(waypoints[waypointIdx]);
-        int dest_x = (int) (deadStateTarget.x / DRAWING_TILE_SIZE);
-        int dest_y = (int) (deadStateTarget.y / DRAWING_TILE_SIZE);
-        nodes = game.field.pathFinder.getPath(tile_x, tile_y, dest_x, dest_y, this);
-        if (nodes.isEmpty()) { //ghost died at the exit from pen
+        if ((state & LEAVING_PEN) != 0) { //ghost don't use maze logic in this state.
+            waypointIdx--;
             usingWaypoints = true;
-            pos.set(deadStateTarget);
-            dir = Vector2.getDirection(pos, waypoints[--waypointIdx]);
+            dir = Vector2.getDirection(pos, waypoints[waypointIdx]);
         } else {
-            Vector2 node = game.field.getNodeOn(tile_x, tile_y);
-            if (node != null) { //ghost died in node
-                nodes.pop();
-                pos.set(node);
-            } 
-            if (!nodes.isEmpty()) {
-                Vector2 n = nodes.top();
-                Direction d = Vector2.getDirection(pos, n);
-                tile_temp1.x = tile_x;
-                tile_temp1.y = tile_y;
-                int next_x = (int) (n.x / DRAWING_TILE_SIZE);
-                int next_y = (int) (n.y / DRAWING_TILE_SIZE);
-                while (tile_temp1.x != next_x && tile_temp1.y != next_y) {
-                    tile_temp1.translateIn(d);
-                    //this is the condition for cases where the path 
-                    //to the pen runs through the boundaries of the game field
-                    if (isObstacle(tile_temp1.x, tile_temp1.y)) { 
-                        d = d.getOpposite();
-                        break;
+            tile_x = (int) (pos.x / DRAWING_TILE_SIZE); 
+            tile_y = (int) (pos.y / DRAWING_TILE_SIZE); 
+            waypoints = game.field.getWaypointsForLeavingPen(this);
+            waypointIdx = waypoints.length - 1;
+            deadStateTarget.set(waypoints[waypointIdx]);
+            int dest_x = (int) (deadStateTarget.x / DRAWING_TILE_SIZE);
+            int dest_y = (int) (deadStateTarget.y / DRAWING_TILE_SIZE);
+            nodes = game.field.pathFinder.getPath(tile_x, tile_y, dest_x, dest_y, this);
+            if (nodes.isEmpty()) { //ghost died at the exit from pen
+                usingWaypoints = true;
+                pos.set(deadStateTarget);
+                dir = Vector2.getDirection(pos, waypoints[--waypointIdx]);
+            } else {
+                Vector2 node = game.field.getNodeOn(tile_x, tile_y);
+                if (node != null) { //ghost died in node
+                    nodes.pop();
+                    pos.set(node);
+                } 
+                if (!nodes.isEmpty()) {
+                    Vector2 n = nodes.top();
+                    Direction d = Vector2.getDirection(pos, n);
+                    tile_temp1.x = tile_x;
+                    tile_temp1.y = tile_y;
+                    int next_x = (int) (n.x / DRAWING_TILE_SIZE);
+                    int next_y = (int) (n.y / DRAWING_TILE_SIZE);
+                    while (tile_temp1.x != next_x && tile_temp1.y != next_y) {
+                        tile_temp1.translateIn(d);
+                        //this is the condition for cases where the path 
+                        //to the pen runs through the boundaries of the game field
+                        if (isObstacle(tile_temp1.x, tile_temp1.y)) { 
+                            d = d.getOpposite();
+                            break;
+                        }
                     }
-                }
-                dir = d;
-            } else dir = Vector2.getDirection(pos, deadStateTarget);
+                    dir = d;
+                } else dir = Vector2.getDirection(pos, deadStateTarget);
+            }
         }
     }
 
