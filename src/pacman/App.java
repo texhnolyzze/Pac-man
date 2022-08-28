@@ -62,7 +62,7 @@ public class App extends Application {
         Image src = new Image(s);
         double w = src.getWidth() * DTS_DIV_TS;
         double h = src.getHeight() * DTS_DIV_TS;
-        Image scaled = new Image(src.impl_getUrl(), w, h, false, false);
+        Image scaled = new Image(src.getUrl(), w, h, false, false);
         return scaled;
     }
     
